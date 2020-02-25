@@ -14,11 +14,10 @@ db = client.backend
 
 @app.route('/projects/list', methods=['GET', 'PUT', 'DELETE', 'POST'])
 def project_list():
-    error = None
     if request.method == 'GET':
         project_list = db.project_list
         results = []
-        project_name = request.args['project']
+        project_name = request.args['project_name']
 
         # project_list is the collection in the database
         # results will be the result thats going to be returned
@@ -47,12 +46,13 @@ def project_list():
         return jsonify({'result': results})
     elif request.method == 'PUT':
         project_list = db.project_list
+        data = request.get_json()
 
-        project_name = request.json['project_name']
-        project_description = request.json['project_description']
-        branch = request.json['branch']
-        difficulty = request.json['difficulty']
-        coolness = request.json['coolness']
+        project_name = data['project_name']
+        project_description = data['project_description']
+        branch = data['branch']
+        difficulty = data['difficulty']
+        coolness = data['coolness']
 
         project_id = project_list.insert(
             {
@@ -92,6 +92,15 @@ def project_list():
                                     }
                                 })
         return project_list.find({ 'project_name' : project_name})
+    elif (request.method == 'DELETE'):
+        project_list = db.project_list
+
+        project_name = request.json['project_name']
+        print("\n\n")
+        print(project_name)
+        project_list.delete_many({ 'project_name' : project_name})
+
+        return True
     else:
         return 'error'
         
